@@ -2,8 +2,11 @@ spring:
   datasource:
     username: postgres
     password: admin
-    url: jdbc:postgresql://localhost:5432/wishlist
+    url: jdbc:postgresql://db:5432/wishlist
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 50
 
 logging:
   level:
