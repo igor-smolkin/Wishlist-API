@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    username: postgres
+    password: admin
+    url: jdbc:postgresql://localhost:5432/wishlist
+    driver-class-name: org.postgresql.Driver
+
+logging:
+  level:
+    root: INFO
+    org.ataraxii.wishlist: DEBUG
+
+app:
+  security:
+    public-paths:
+      - /api/v1/login
+      - /api/v1/register
+      - /swagger-ui
+      - /v3
