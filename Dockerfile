@@ -1,9 +1,8 @@
-FROM openjdk:17-jdk-slim
-
+FROM gradle:8.1.1-jdk17 AS build
+COPY . /app
 WORKDIR /app
+RUN ./gradlew bootJar
 
-COPY build/libs/app.jar app.jar
-
-EXPOSE 8080
-
+FROM openjdk:17-jdk-slim
+COPY --from=build /app/build/libs/app.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
