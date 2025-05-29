@@ -30,7 +30,9 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     public AuthResponseDto registerUser(AuthRequestDto req) {
+        log.info("Попытка регистрации: username={}", req.getUsername());
         if (userRepository.existsByUsername(req.getUsername())) {
+            log.warn("Ошибка регистрации: пользователь с именем '{}' уже существует", req.getUsername());
             throw new ConflictException("Пользователь с таким именем уже существует");
         }
 
@@ -49,17 +51,29 @@ public class AuthService {
                 .username(user.getUsername())
                 .build();
 
+        log.info("Пользователь '{}' успешно зарегистрирован", req.getUsername());
         return AuthResponseDto.builder()
                 .user(userDto)
                 .build();
     }
 
     public AuthResponseDto loginUser(AuthRequestDto req) {
+        log.info("Попытка входа: username={}", req.getUsername());
+
         User user = userRepository.findByUsername(req.getUsername())
-                .orElseThrow(() -> new NotFoundException("Пользователь с таким именем не найден"));
+                .orElse(null);
+
+        if (user == null) {
+            log.warn("Ошибка входа: пользователь '{}' не найден", req.getUsername());
+            throw new NotFoundException("Пользователь с таким именем не найден");
+        }
+
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+            log.warn("Ошибка входа: неверный пароль для пользователя '{}'", req.getUsername());
             throw new UnauthorizedException("Неверный пароль");
         }
+
+        log.info("Пользователь вошел в систему: username={}", req.getUsername());
 
         return getAuthResponseDto(user);
     }

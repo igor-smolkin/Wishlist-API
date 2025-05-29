@@ -2,7 +2,7 @@ spring:
   datasource:
     username: postgres
     password: admin
-    url: jdbc:postgresql://db:5432/wishlist
+    url: jdbc:postgresql://localhost:5432/wishlist
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
@@ -14,8 +14,8 @@ spring:
 
 logging:
   level:
-    root: INFO
-    org.ataraxii.wishlist: DEBUG
+    root: WARN
+    org.ataraxii.wishlist: INFO
 
 app:
   security:
