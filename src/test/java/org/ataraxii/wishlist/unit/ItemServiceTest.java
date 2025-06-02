@@ -12,14 +12,11 @@ import org.ataraxii.wishlist.dto.item.ItemResponseDto;
 import org.ataraxii.wishlist.exception.NotFoundException;
 import org.ataraxii.wishlist.mapper.ItemMapper;
 import org.ataraxii.wishlist.service.ItemService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.time.Instant;
 import java.util.Optional;

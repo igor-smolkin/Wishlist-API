@@ -8,13 +8,11 @@ import org.ataraxii.wishlist.dto.authentication.AuthResponseDto;
 import org.ataraxii.wishlist.exception.ConflictException;
 import org.ataraxii.wishlist.exception.NotFoundException;
 import org.ataraxii.wishlist.service.AuthService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,9 +29,6 @@ class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private SessionRepository sessionRepository;
 
     @Mock
     private BCryptPasswordEncoder passwordEncoder;

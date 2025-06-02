@@ -1,21 +1,17 @@
 package org.ataraxii.wishlist.unit;
 
 import org.ataraxii.wishlist.database.entity.Folder;
-import org.ataraxii.wishlist.database.entity.Item;
 import org.ataraxii.wishlist.database.entity.User;
 import org.ataraxii.wishlist.database.repository.FolderRepository;
 import org.ataraxii.wishlist.dto.folder.FolderDto;
 import org.ataraxii.wishlist.dto.folder.FolderResponseDto;
-import org.ataraxii.wishlist.dto.item.ItemDto;
 import org.ataraxii.wishlist.exception.NotFoundException;
 import org.ataraxii.wishlist.mapper.FolderMapper;
 import org.ataraxii.wishlist.service.FolderService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
