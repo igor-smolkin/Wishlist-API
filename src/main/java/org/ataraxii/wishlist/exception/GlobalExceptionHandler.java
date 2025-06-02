@@ -12,7 +12,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(ConflictException ex) {
+    public ResponseEntity<Map<String, Object>> handleAlreadyExists(ConflictException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "Conflict");

@@ -19,10 +19,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
@@ -69,14 +73,14 @@ class ItemServiceTest {
                 .folderId(null)
                 .build();
 
-        Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(testItem);
-        Mockito.when(itemMapper.toDto(Mockito.any(Item.class), Mockito.isNull())).thenReturn(expectedResponse);
+        when(itemRepository.save(any(Item.class))).thenReturn(testItem);
+        when(itemMapper.toDto(any(Item.class), isNull())).thenReturn(expectedResponse);
 
         ItemResponseDto actualResponse = itemService.createItem(dto, testUser);
 
-        Assertions.assertEquals(expectedResponse, actualResponse);
-        Mockito.verify(itemRepository).save(Mockito.any(Item.class));
-        Mockito.verify(itemFolderRepository, Mockito.never()).save(Mockito.any());
+        assertEquals(expectedResponse, actualResponse);
+        verify(itemRepository).save(any(Item.class));
+        verify(itemFolderRepository, never()).save(any());
     }
 
     @Test
@@ -120,17 +124,17 @@ class ItemServiceTest {
                 .folderId(folderId)
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
-        Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(testItem);
-        Mockito.when(itemFolderRepository.save(Mockito.any(ItemFolder.class))).thenReturn(testItemFolder);
-        Mockito.when(itemMapper.toDto(Mockito.any(Item.class), Mockito.eq(folderId))).thenReturn(expectedResponse);
+        when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
+        when(itemRepository.save(any(Item.class))).thenReturn(testItem);
+        when(itemFolderRepository.save(any(ItemFolder.class))).thenReturn(testItemFolder);
+        when(itemMapper.toDto(any(Item.class), eq(folderId))).thenReturn(expectedResponse);
 
         ItemResponseDto actualResponse = itemService.createItem(dto, testUser);
 
-        Assertions.assertEquals(expectedResponse, actualResponse);
-        Mockito.verify(itemRepository).save(Mockito.any(Item.class));
-        Mockito.verify(folderRepository).findByIdAndUser(folderId, testUser);
-        Mockito.verify(itemFolderRepository).save(Mockito.any(ItemFolder.class));
+        assertEquals(expectedResponse, actualResponse);
+        verify(itemRepository).save(any(Item.class));
+        verify(folderRepository).findByIdAndUser(folderId, testUser);
+        verify(itemFolderRepository).save(any(ItemFolder.class));
     }
 
     @Test
@@ -151,14 +155,14 @@ class ItemServiceTest {
                 .folderId(wrongFolderId)
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(wrongFolderId, testUser)).thenReturn(Optional.empty());
+        when(folderRepository.findByIdAndUser(wrongFolderId, testUser)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             itemService.createItem(dto, testUser);
         });
 
-        Mockito.verify(itemRepository, Mockito.never()).save(Mockito.any());
-        Mockito.verify(itemFolderRepository, Mockito.never()).save(Mockito.any());
+        verify(itemRepository, never()).save(any());
+        verify(itemFolderRepository, never()).save(any());
     }
 
     @Test
@@ -188,13 +192,13 @@ class ItemServiceTest {
                 .folderId(null)
                 .build();
 
-        Mockito.when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));
-        Mockito.when(itemMapper.toDto(Mockito.any(Item.class))).thenReturn(expectedResponse);
+        when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));
+        when(itemMapper.toDto(any(Item.class))).thenReturn(expectedResponse);
 
         ItemResponseDto actualResponse = itemService.findItemById(testUser, itemId);
 
-        Assertions.assertEquals(expectedResponse, actualResponse);
-        Mockito.verify(itemRepository).findByIdAndUser(itemId, testUser);
+        assertEquals(expectedResponse, actualResponse);
+        verify(itemRepository).findByIdAndUser(itemId, testUser);
     }
 
     @Test
@@ -209,9 +213,9 @@ class ItemServiceTest {
                 .createdAt(Instant.now())
                 .build();
 
-        Mockito.when(itemRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             itemService.findItemById(testUser, incorrectItemId);
         });
     }
@@ -255,16 +259,16 @@ class ItemServiceTest {
                 .folderId(null)
                 .build();
 
-        Mockito.when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));
-        Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(updatedItem);
-        Mockito.when(itemMapper.toDto(Mockito.any(Item.class))).thenReturn(expectedResponse);
+        when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));
+        when(itemRepository.save(any(Item.class))).thenReturn(updatedItem);
+        when(itemMapper.toDto(any(Item.class))).thenReturn(expectedResponse);
 
         ItemResponseDto actualResponse = itemService.updateItem(testUser, itemId, updatedItemDto);
 
-        Assertions.assertEquals(expectedResponse, actualResponse);
-        Mockito.verify(itemRepository).findByIdAndUser(itemId, testUser);
-        Mockito.verify(itemRepository).save(Mockito.any(Item.class));
-        Mockito.verify(itemMapper).toDto(Mockito.any(Item.class));
+        assertEquals(expectedResponse, actualResponse);
+        verify(itemRepository).findByIdAndUser(itemId, testUser);
+        verify(itemRepository).save(any(Item.class));
+        verify(itemMapper).toDto(any(Item.class));
     }
 
     @Test
@@ -284,13 +288,13 @@ class ItemServiceTest {
                 .url("updatedurl.com/url/url")
                 .build();
 
-        Mockito.when(itemRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             itemService.updateItem(testUser, incorrectItemId, updatedItemDto);
         });
 
-        Mockito.verify(itemRepository, Mockito.never()).save(Mockito.any());
+        verify(itemRepository, never()).save(any());
     }
 
     @Test
@@ -312,11 +316,11 @@ class ItemServiceTest {
                 .user(testUser)
                 .build();
 
-        Mockito.when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));
+        when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));
 
         itemService.deleteItem(testUser, itemId);
 
-        Mockito.verify(itemRepository).delete(testItem);
+        verify(itemRepository).delete(testItem);
     }
 
     @Test
@@ -331,12 +335,12 @@ class ItemServiceTest {
                 .createdAt(Instant.now())
                 .build();
 
-        Mockito.when(itemRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             itemService.deleteItem(testUser, incorrectItemId);
         });
 
-        Mockito.verify(itemRepository, Mockito.never()).delete(Mockito.any());
+        verify(itemRepository, never()).delete(any());
     }
 }

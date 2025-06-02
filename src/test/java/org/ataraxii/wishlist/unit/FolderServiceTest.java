@@ -22,6 +22,9 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class FolderServiceTest {
 
@@ -61,13 +64,13 @@ class FolderServiceTest {
                 .name("testfolder")
                 .build();
 
-        Mockito.when(folderRepository.save(Mockito.any(Folder.class))).thenReturn(testFolder);
-        Mockito.when(folderMapper.toDto(Mockito.any(Folder.class))).thenReturn(expectedResponse);
+        when(folderRepository.save(any(Folder.class))).thenReturn(testFolder);
+        when(folderMapper.toDto(any(Folder.class))).thenReturn(expectedResponse);
 
         FolderResponseDto actualResponse = folderService.createFolder(dto, testUser);
 
-        Assertions.assertEquals(expectedResponse, actualResponse);
-        Mockito.verify(folderRepository).save(Mockito.any(Folder.class));
+        assertEquals(expectedResponse, actualResponse);
+        verify(folderRepository).save(any(Folder.class));
     }
 
     @Test
@@ -93,13 +96,13 @@ class FolderServiceTest {
                 .name("testfolder")
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
-        Mockito.when(folderMapper.toDto(Mockito.any(Folder.class))).thenReturn(expectedResponse);
+        when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
+        when(folderMapper.toDto(any(Folder.class))).thenReturn(expectedResponse);
 
         FolderResponseDto actualResponse = folderService.findFolderById(testUser, folderId);
 
-        Assertions.assertEquals(expectedResponse, actualResponse);
-        Mockito.verify(folderRepository).findByIdAndUser(folderId, testUser);
+        assertEquals(expectedResponse, actualResponse);
+        verify(folderRepository).findByIdAndUser(folderId, testUser);
     }
 
     @Test
@@ -114,9 +117,9 @@ class FolderServiceTest {
                 .createdAt(Instant.now())
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.empty());
+        when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             folderService.findFolderById(testUser, folderId);
         });
     }
@@ -154,17 +157,17 @@ class FolderServiceTest {
                 .name("testfolder")
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
-        Mockito.when(folderRepository.save(Mockito.any(Folder.class))).thenReturn(updatedFolder);
-        Mockito.when(folderMapper.toDto(Mockito.any(Folder.class))).thenReturn(expectedResponse);
+        when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
+        when(folderRepository.save(any(Folder.class))).thenReturn(updatedFolder);
+        when(folderMapper.toDto(any(Folder.class))).thenReturn(expectedResponse);
 
         FolderResponseDto actualResponse = folderService.updateFolder(testUser, folderId, updatedFolderDto);
 
-        Assertions.assertEquals(expectedResponse, actualResponse);
+        assertEquals(expectedResponse, actualResponse);
 
-        Mockito.verify(folderRepository).findByIdAndUser(folderId, testUser);
-        Mockito.verify(folderRepository).save(Mockito.any(Folder.class));
-        Mockito.verify(folderMapper).toDto(Mockito.any(Folder.class));
+        verify(folderRepository).findByIdAndUser(folderId, testUser);
+        verify(folderRepository).save(any(Folder.class));
+        verify(folderMapper).toDto(any(Folder.class));
     }
 
     @Test
@@ -183,13 +186,13 @@ class FolderServiceTest {
                 .name("updatedfolder")
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
+        when(folderRepository.findByIdAndUser(incorrectItemId, testUser)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             folderService.updateFolder(testUser, incorrectItemId, updatedFolderDto);
         });
 
-        Mockito.verify(folderRepository, Mockito.never()).save(Mockito.any());
+        verify(folderRepository, never()).save(any());
     }
 
     @Test
@@ -210,11 +213,11 @@ class FolderServiceTest {
                 .user(testUser)
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
+        when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
 
         folderService.deleteFolder(testUser, folderId);
 
-        Mockito.verify(folderRepository).delete(Mockito.any());
+        verify(folderRepository).delete(any());
     }
 
     @Test
@@ -229,12 +232,12 @@ class FolderServiceTest {
                 .createdAt(Instant.now())
                 .build();
 
-        Mockito.when(folderRepository.findByIdAndUser(incorrectFolderId, testUser)).thenReturn(Optional.empty());
+        when(folderRepository.findByIdAndUser(incorrectFolderId, testUser)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             folderService.deleteFolder(testUser, incorrectFolderId);
         });
 
-        Mockito.verify(folderRepository, Mockito.never()).delete(Mockito.any());
+        verify(folderRepository, never()).delete(any());
     }
 }
