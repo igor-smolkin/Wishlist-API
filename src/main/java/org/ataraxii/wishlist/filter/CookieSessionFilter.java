@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ataraxii.wishlist.database.entity.User;
 import org.ataraxii.wishlist.service.SessionService;
 import org.ataraxii.wishlist.config.SecurityProperties;
@@ -14,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CookieSessionFilter extends OncePerRequestFilter {
@@ -39,25 +41,34 @@ public class CookieSessionFilter extends OncePerRequestFilter {
             for (Cookie cookie : cookies) {
                 if ("sessionId".equals(cookie.getName())) {
                     sessionId = cookie.getValue();
+                    log.info("Найден cookie sessionId: {}", sessionId);
                     break;
                 }
             }
+        } else {
+            log.info("В запросе отсутствуют cookies");
+        }
+
+        if (sessionId == null) {
+            log.warn("Отсутствует cookie с именем sessionId");
         }
 
         if (sessionId == null || !sessionService.isValid(sessionId)) {
+            log.warn("Неавторизованный запрос: отсутствует или недействительный sessionId");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("""
-                        {
-                            "status": 401,
-                            "error": "Unauthorized",
-                            "message": "Сессия не найдена"
-                        }
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "Сессия не найдена"
+                    }
                     """);
             return;
         }
 
         User user = sessionService.getUserBySessionId(sessionId);
+        log.info("Пользователь {} аутентифицирован по sessionId", user.getUsername());
         request.setAttribute("currentUser", user);
         filterChain.doFilter(request, response);
     }
