@@ -15,7 +15,7 @@ public class CookieUtil {
         try {
             Cookie cookie = new Cookie(NAME, sessionId.toString());
             cookie.setHttpOnly(true);
-            cookie.setSecure(true);
+            cookie.setSecure(false); // true - при HTTPS протоколе, false - при HTTP протоколе
             cookie.setPath("/");
             cookie.setMaxAge(30 * 60);
             response.addCookie(cookie);
@@ -27,7 +27,7 @@ public class CookieUtil {
     public static void deleteSessionCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(NAME, null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(false); // true - при HTTPS протоколе, false - при HTTP протоколе
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
