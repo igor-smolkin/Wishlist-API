@@ -25,20 +25,19 @@ CREATE TABLE IF NOT EXISTS item
     user_id uuid references users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS folder
+CREATE TABLE IF NOT EXISTS wishlist
 (
     id      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name    varchar(32) NOT NULL,
-    user_id uuid references users (id) ON DELETE CASCADE,
-    UNIQUE (user_id, name)
+    user_id uuid references users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS item_folder
+CREATE TABLE IF NOT EXISTS item_wishlist
 (
     id        BIGSERIAL PRIMARY KEY,
     item_id   uuid references item (id) ON DELETE CASCADE,
-    folder_id uuid references folder ON DELETE CASCADE,
-    UNIQUE (item_id, folder_id)
+    wishlist_id uuid references wishlist ON DELETE CASCADE,
+    UNIQUE (item_id, wishlist_id)
 );
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";

@@ -3,12 +3,12 @@ package org.ataraxii.wishlist.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ataraxii.wishlist.database.entity.Folder;
 import org.ataraxii.wishlist.database.entity.Item;
-import org.ataraxii.wishlist.database.entity.ItemFolder;
+import org.ataraxii.wishlist.database.entity.ItemWishlist;
 import org.ataraxii.wishlist.database.entity.User;
-import org.ataraxii.wishlist.database.repository.FolderRepository;
-import org.ataraxii.wishlist.database.repository.ItemFolderRepository;
+import org.ataraxii.wishlist.database.entity.Wishlist;
+import org.ataraxii.wishlist.database.repository.WishlistRepository;
+import org.ataraxii.wishlist.database.repository.ItemWishlistRepository;
 import org.ataraxii.wishlist.database.repository.ItemRepository;
 import org.ataraxii.wishlist.dto.item.ItemDto;
 import org.ataraxii.wishlist.dto.item.ItemResponseDto;
@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 public class ItemService {
 
     private final ItemRepository itemRepository;
-    private final FolderRepository folderRepository;
-    private final ItemFolderRepository itemFolderRepository;
+    private final WishlistRepository wishlistRepository;
+    private final ItemWishlistRepository itemWishlistRepository;
     private final ItemMapper itemMapper;
 
     @Transactional
@@ -39,30 +39,30 @@ public class ItemService {
                 .user(currentUser)
                 .build();
 
-        UUID folderId = null;
+        UUID wishlistId = null;
 
-        if (dto.getFolderId() != null) {
-            Folder folder = folderRepository.findByIdAndUser(dto.getFolderId(), currentUser)
+        if (dto.getWishlistId() != null) {
+            Wishlist wishlist = wishlistRepository.findByIdAndUser(dto.getWishlistId(), currentUser)
                     .orElse(null);
 
-            if (folder == null) {
-                log.warn("Ошибка создания предмета: папка с id={} не найдена у пользователя {}", dto.getFolderId(), currentUser.getUsername());
-                throw new NotFoundException("Папка не найдена");
+            if (wishlist == null) {
+                log.warn("Ошибка создания предмета: вишлист с id={} не найден у пользователя {}", dto.getWishlistId(), currentUser.getUsername());
+                throw new NotFoundException("Вишлист не найден");
             }
             itemRepository.save(item);
-            log.info("Предмет {} успешно создан в папке {} пользователем {}", item.getName(), folder.getName(), currentUser.getUsername());
+            log.info("Предмет {} успешно создан в вишлисте {} пользователем {}", item.getName(), wishlist.getName(), currentUser.getUsername());
 
-            ItemFolder itemFolder = ItemFolder.builder()
+            ItemWishlist itemWishlist = ItemWishlist.builder()
                     .item(item)
-                    .folder(folder)
+                    .wishlist(wishlist)
                     .build();
-            itemFolderRepository.save(itemFolder);
-            folderId = folder.getId();
+            itemWishlistRepository.save(itemWishlist);
+            wishlistId = wishlist.getId();
         } else {
             itemRepository.save(item);
             log.info("Предмет {} успешно создан пользователем {}", item.getName(), currentUser.getUsername());
         }
-        return itemMapper.toDto(item, folderId);
+        return itemMapper.toDto(item, wishlistId);
     }
 
     public List<ItemResponseDto> findAllItems(User currentUser) {
@@ -70,12 +70,12 @@ public class ItemService {
         log.info("Найдено {} предметов у пользователя {}", items.size(), currentUser.getUsername());
         return items.stream()
                 .map(item -> {
-                    UUID folderId = null;
-                    List<ItemFolder> folders = item.getItemFolder();
-                    if (folders != null && !folders.isEmpty()) {
-                        folderId = folders.get(0).getFolder().getId();
+                    UUID wishlistId = null;
+                    List<ItemWishlist> wishlists = item.getItemWishlist();
+                    if (wishlists != null && !wishlists.isEmpty()) {
+                        wishlistId = wishlists.get(0).getWishlist().getId();
                     }
-                    return itemMapper.toDto(item, folderId);
+                    return itemMapper.toDto(item, wishlistId);
                 })
                 .collect(Collectors.toList());
     }
@@ -100,7 +100,7 @@ public class ItemService {
             log.warn("Ошибка обновления предмета: предмет с id={} не найден у пользователя {}", id, currentUser.getUsername());
             throw new NotFoundException("Предмет с таким id не найден");
         }
-        log.info("Обновление папки {} пользователем {}", item.getName(), currentUser.getUsername());
+        log.info("Обновление вишлиста {} пользователем {}", item.getName(), currentUser.getUsername());
 
         item.setName(updatedItem.getName());
         item.setUrl(updatedItem.getUrl());

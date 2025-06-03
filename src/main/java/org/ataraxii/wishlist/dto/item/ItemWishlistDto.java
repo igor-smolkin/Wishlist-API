@@ -7,10 +7,9 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ItemResponseDto {
+public class ItemWishlistDto {
+
     private UUID id;
     private String name;
     private String url;
-    private UUID user;
-    private UUID wishlistId;
 }

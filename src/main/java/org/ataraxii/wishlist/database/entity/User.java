@@ -35,7 +35,7 @@ public class User {
     private List<Item> items;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Folder> folders;
+    private List<Wishlist> wishlists;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Session> sessions;

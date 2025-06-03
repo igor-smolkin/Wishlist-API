@@ -31,6 +31,9 @@ class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private SessionRepository sessionRepository;
+
+    @Mock
     private BCryptPasswordEncoder passwordEncoder;
 
     @InjectMocks

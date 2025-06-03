@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
-public class FolderControllerIT {
+public class WishlistControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
@@ -55,19 +55,19 @@ public class FolderControllerIT {
         }
 
         @Test
-        void createFolder_success() throws Exception {
-            String folderJson = """
+        void createWishlist_success() throws Exception {
+            String wishlistJson = """
                             {
-                                "name": "testfolder"
+                                "name": "test-wishlist"
                             }
                     """;
 
-            mockMvc.perform(post("/api/v1/folders")
+            mockMvc.perform(post("/api/v1/wishlists")
                             .cookie(new Cookie("sessionId", sessionId))
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(folderJson))
+                            .content(wishlistJson))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.name").value("testfolder"));
+                    .andExpect(jsonPath("$.name").value("test-wishlist"));
         }
     }
 
@@ -75,16 +75,16 @@ public class FolderControllerIT {
     class UnauthorizedTests {
 
         @Test
-        void createFolder_success() throws Exception {
-            String folderJson = """
+        void createWishlist_success() throws Exception {
+            String wishlistJson = """
                             {
-                                "name": "testfolder"
+                                "name": "test-wishlist"
                             }
                     """;
 
-            mockMvc.perform(post("/api/v1/folders")
+            mockMvc.perform(post("/api/v1/wishlists")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(folderJson))
+                            .content(wishlistJson))
                     .andExpect(status().isUnauthorized())
                     .andExpect(jsonPath("$.message").value("Сессия не найдена"));
         }

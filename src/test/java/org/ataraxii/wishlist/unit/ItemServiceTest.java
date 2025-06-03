@@ -1,11 +1,11 @@
 package org.ataraxii.wishlist.unit;
 
-import org.ataraxii.wishlist.database.entity.Folder;
 import org.ataraxii.wishlist.database.entity.Item;
-import org.ataraxii.wishlist.database.entity.ItemFolder;
+import org.ataraxii.wishlist.database.entity.ItemWishlist;
 import org.ataraxii.wishlist.database.entity.User;
-import org.ataraxii.wishlist.database.repository.FolderRepository;
-import org.ataraxii.wishlist.database.repository.ItemFolderRepository;
+import org.ataraxii.wishlist.database.entity.Wishlist;
+import org.ataraxii.wishlist.database.repository.WishlistRepository;
+import org.ataraxii.wishlist.database.repository.ItemWishlistRepository;
 import org.ataraxii.wishlist.database.repository.ItemRepository;
 import org.ataraxii.wishlist.dto.item.ItemDto;
 import org.ataraxii.wishlist.dto.item.ItemResponseDto;
@@ -32,10 +32,10 @@ class ItemServiceTest {
     private ItemRepository itemRepository;
 
     @Mock
-    private FolderRepository folderRepository;
+    private WishlistRepository wishlistRepository;
 
     @Mock
-    private ItemFolderRepository itemFolderRepository;
+    private ItemWishlistRepository itemWishlistRepository;
 
     @Mock
     private ItemMapper itemMapper;
@@ -55,7 +55,7 @@ class ItemServiceTest {
         ItemDto dto = ItemDto.builder()
                 .name("testname")
                 .url("testurl.com/url/url")
-                .folderId(null)
+                .wishlistId(null)
                 .build();
 
         Item testItem = Item.builder()
@@ -67,7 +67,7 @@ class ItemServiceTest {
         ItemResponseDto expectedResponse = ItemResponseDto.builder()
                 .name("testname")
                 .url("testurl.com/url/url")
-                .folderId(null)
+                .wishlistId(null)
                 .build();
 
         when(itemRepository.save(any(Item.class))).thenReturn(testItem);
@@ -77,7 +77,7 @@ class ItemServiceTest {
 
         assertEquals(expectedResponse, actualResponse);
         verify(itemRepository).save(any(Item.class));
-        verify(itemFolderRepository, never()).save(any());
+        verify(itemWishlistRepository, never()).save(any());
     }
 
     @Test
@@ -95,7 +95,7 @@ class ItemServiceTest {
         ItemDto dto = ItemDto.builder()
                 .name("testname")
                 .url("testurl.com/url/url")
-                .folderId(folderId)
+                .wishlistId(folderId)
                 .build();
 
         Item testItem = Item.builder()
@@ -104,34 +104,34 @@ class ItemServiceTest {
                 .user(testUser)
                 .build();
 
-        Folder testFolder = Folder.builder()
+        Wishlist testWishlist = org.ataraxii.wishlist.database.entity.Wishlist.builder()
                 .id(folderId)
                 .name("Test Folder")
                 .user(testUser)
                 .build();
 
-        ItemFolder testItemFolder = ItemFolder.builder()
+        ItemWishlist testItemWishlist = ItemWishlist.builder()
                 .item(testItem)
-                .folder(testFolder)
+                .wishlist(testWishlist)
                 .build();
 
         ItemResponseDto expectedResponse = ItemResponseDto.builder()
                 .name("testname")
                 .url("testurl.com/url/url")
-                .folderId(folderId)
+                .wishlistId(folderId)
                 .build();
 
-        when(folderRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testFolder));
+        when(wishlistRepository.findByIdAndUser(folderId, testUser)).thenReturn(Optional.of(testWishlist));
         when(itemRepository.save(any(Item.class))).thenReturn(testItem);
-        when(itemFolderRepository.save(any(ItemFolder.class))).thenReturn(testItemFolder);
+        when(itemWishlistRepository.save(any(ItemWishlist.class))).thenReturn(testItemWishlist);
         when(itemMapper.toDto(any(Item.class), eq(folderId))).thenReturn(expectedResponse);
 
         ItemResponseDto actualResponse = itemService.createItem(dto, testUser);
 
         assertEquals(expectedResponse, actualResponse);
         verify(itemRepository).save(any(Item.class));
-        verify(folderRepository).findByIdAndUser(folderId, testUser);
-        verify(itemFolderRepository).save(any(ItemFolder.class));
+        verify(wishlistRepository).findByIdAndUser(folderId, testUser);
+        verify(itemWishlistRepository).save(any(ItemWishlist.class));
     }
 
     @Test
@@ -149,17 +149,17 @@ class ItemServiceTest {
         ItemDto dto = ItemDto.builder()
                 .name("testname")
                 .url("testurl.com/url/url")
-                .folderId(wrongFolderId)
+                .wishlistId(wrongFolderId)
                 .build();
 
-        when(folderRepository.findByIdAndUser(wrongFolderId, testUser)).thenReturn(Optional.empty());
+        when(wishlistRepository.findByIdAndUser(wrongFolderId, testUser)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> {
             itemService.createItem(dto, testUser);
         });
 
         verify(itemRepository, never()).save(any());
-        verify(itemFolderRepository, never()).save(any());
+        verify(itemWishlistRepository, never()).save(any());
     }
 
     @Test
@@ -186,7 +186,7 @@ class ItemServiceTest {
                 .name("testname")
                 .url("testurl.com/url/url")
                 .user(testUser.getId())
-                .folderId(null)
+                .wishlistId(null)
                 .build();
 
         when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));
@@ -253,7 +253,7 @@ class ItemServiceTest {
                 .name(updatedItem.getName())
                 .url(updatedItem.getUrl())
                 .user(updatedItem.getUser().getId())
-                .folderId(null)
+                .wishlistId(null)
                 .build();
 
         when(itemRepository.findByIdAndUser(itemId, testUser)).thenReturn(Optional.of(testItem));

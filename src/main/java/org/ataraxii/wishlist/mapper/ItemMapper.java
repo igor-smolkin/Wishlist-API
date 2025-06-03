@@ -28,7 +28,7 @@ public class ItemMapper {
                 .name(item.getName())
                 .url(item.getUrl())
                 .user(item.getUser().getId())
-                .folderId(folderId)
+                .wishlistId(folderId)
                 .build();
     }
 }

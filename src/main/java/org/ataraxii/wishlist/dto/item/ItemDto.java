@@ -18,5 +18,5 @@ public class ItemDto {
     @NotBlank
     private String url;
 
-    private UUID folderId;
+    private UUID wishlistId;
 }

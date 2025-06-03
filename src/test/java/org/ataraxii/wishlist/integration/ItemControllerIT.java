@@ -3,7 +3,7 @@ package org.ataraxii.wishlist.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
-import org.ataraxii.wishlist.dto.folder.FolderResponseDto;
+import org.ataraxii.wishlist.dto.wishlist.WishlistResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -58,26 +58,26 @@ public class ItemControllerIT {
             sessionId = result.getResponse().getCookie("sessionId").getValue();
         }
 
-        UUID createFolder() throws Exception {
-            String folderJson = """
+        UUID createWishlist() throws Exception {
+            String wishlistJson = """
                             {
-                                "name": "testfolder"
+                                "name": "test-wishlist"
                             }
                     """;
 
-            MvcResult result = mockMvc.perform(post("/api/v1/folders")
+            MvcResult result = mockMvc.perform(post("/api/v1/wishlists")
                             .cookie(new Cookie("sessionId", sessionId))
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(folderJson))
+                            .content(wishlistJson))
                     .andReturn();
 
             String json = result.getResponse().getContentAsString();
-            FolderResponseDto responseDto = new ObjectMapper().readValue(json, FolderResponseDto.class);
+            WishlistResponseDto responseDto = new ObjectMapper().readValue(json, WishlistResponseDto.class);
             return responseDto.getId();
         }
 
         @Test
-        void createItem_withoutFolder_success() throws Exception {
+        void createItem_withoutWishlist_success() throws Exception {
             String jsonItem = """
                             {
                                 "name": "testname",
@@ -94,17 +94,17 @@ public class ItemControllerIT {
         }
 
         @Test
-        void createItem_withFolder_success() throws Exception {
+        void createItem_withWishlist_success() throws Exception {
 
-            UUID folderId = createFolder();
+            UUID wishlistId = createWishlist();
 
             String jsonItem = """
                             {
                                 "name": "testname",
                                 "url": "testurl",
-                                "folderId": "%s"
+                                "wishlistId": "%s"
                             }
-                    """.formatted(folderId.toString());
+                    """.formatted(wishlistId.toString());
 
             mockMvc.perform(post("/api/v1/items")
                             .cookie(new Cookie("sessionId", sessionId))
@@ -112,28 +112,28 @@ public class ItemControllerIT {
                             .content(jsonItem))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.name").value("testname"))
-                    .andExpect(jsonPath("$.folderId").value(folderId.toString()));
+                    .andExpect(jsonPath("$.wishlistId").value(wishlistId.toString()));
         }
 
         @Test
-        void createItem_withWrongFolder_folderNotFound() throws Exception {
+        void createItem_withWrongWishlist_wishlistNotFound() throws Exception {
 
-            UUID wrongFolderId = UUID.randomUUID();
+            UUID wrongWishlistId = UUID.randomUUID();
 
             String jsonItem = """
                             {
                                 "name": "testname",
                                 "url": "testurl",
-                                "folderId": "%s"
+                                "wishlistId": "%s"
                             }
-                    """.formatted(wrongFolderId.toString());
+                    """.formatted(wrongWishlistId.toString());
 
             mockMvc.perform(post("/api/v1/items")
                             .cookie(new Cookie("sessionId", sessionId))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(jsonItem))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value("Папка не найдена"));
+                    .andExpect(jsonPath("$.message").value("Вишлист не найден"));
         }
     }
 
@@ -141,7 +141,7 @@ public class ItemControllerIT {
     class UnauthorizedTests {
 
         @Test
-        void createItem_withoutFolder_returnUnauthorized() throws Exception {
+        void createItem_withoutWishlist_returnUnauthorized() throws Exception {
             String jsonItem = """
                             {
                                 "name": "testname",
@@ -157,17 +157,17 @@ public class ItemControllerIT {
         }
 
         @Test
-        void createItem_withWrongFolder_returnUnauthorized() throws Exception {
+        void createItem_withWrongWishlist_returnUnauthorized() throws Exception {
 
-            UUID wrongFolderId = UUID.randomUUID();
+            UUID wrongWishlistId = UUID.randomUUID();
 
             String jsonItem = """
                             {
                                 "name": "testname",
                                 "url": "testurl",
-                                "folderId": "%s"
+                                "wishlistId": "%s"
                             }
-                    """.formatted(wrongFolderId.toString());
+                    """.formatted(wrongWishlistId.toString());
 
             mockMvc.perform(post("/api/v1/items")
                             .contentType(MediaType.APPLICATION_JSON)

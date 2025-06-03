@@ -31,5 +31,5 @@ public class Item {
     private User user;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemFolder> itemFolder;
+    private List<ItemWishlist> itemWishlist;
 }

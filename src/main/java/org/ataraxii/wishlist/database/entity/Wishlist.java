@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @Builder
 @Entity
-public class Folder {
+public class Wishlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,6 +27,6 @@ public class Folder {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemFolder> itemFolder;
+    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemWishlist> itemWishlist;
 }

@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Entity
-@Table(name = "item_folder")
-public class ItemFolder {
+@Table(name = "item_wishlist")
+public class ItemWishlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +23,6 @@ public class ItemFolder {
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "folder_id")
-    private Folder folder;
+    @JoinColumn(name = "wishlist_id")
+    private Wishlist wishlist;
 }
