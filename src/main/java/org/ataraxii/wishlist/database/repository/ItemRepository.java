@@ -1,7 +1,6 @@
 package org.ataraxii.wishlist.database.repository;
 
 import org.ataraxii.wishlist.database.entity.Item;
-import org.ataraxii.wishlist.database.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, UUID> {
-    List<Item> findAllByUser(User user);
-    Optional<Item> findByIdAndUser(UUID id, User user);
+    Optional<Item> findItemByIdAndUserId(UUID itemId, UUID userId);
 }

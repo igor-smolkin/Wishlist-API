@@ -26,9 +26,8 @@ public class Item {
     @Column(nullable = false)
     private String url;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemWishlist> itemWishlist;

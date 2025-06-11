@@ -23,9 +23,8 @@ public class Wishlist {
     @Column(length = 32, nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemWishlist> itemWishlist;

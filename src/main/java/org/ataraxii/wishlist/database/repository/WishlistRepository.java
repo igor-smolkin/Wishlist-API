@@ -1,6 +1,5 @@
 package org.ataraxii.wishlist.database.repository;
 
-import org.ataraxii.wishlist.database.entity.User;
 import org.ataraxii.wishlist.database.entity.Wishlist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,6 +10,4 @@ import java.util.UUID;
 
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist, UUID> {
-    Optional<Wishlist> findByIdAndUser(UUID id, User user);
-    List<Wishlist> findByUser(User user);
 }
