@@ -22,13 +22,13 @@ public class ItemMapper {
                 .build();
     }
 
-//    public ItemResponseDto toDto(Item item, UUID folderId) {
-//        return ItemResponseDto.builder()
-//                .id(item.getId())
-//                .name(item.getName())
-//                .url(item.getUrl())
-//                .user(item.getUser().getId())
-//                .wishlistId(folderId)
-//                .build();
-//    }
+    public ItemResponseDto toDto(UUID userId, Item item, UUID wishlistId) {
+        return ItemResponseDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .url(item.getUrl())
+                .user(userId)
+                .wishlistId(wishlistId)
+                .build();
+    }
 }
