@@ -92,4 +92,31 @@ public class WishlistService {
         wishlistRepository.delete(wishlist);
         log.info("Вишлист {} удален пользователем {}", wishlist.getName(), username);
     }
+
+    public WishlistItemsResponseDto checkShared(UUID id) {
+        Wishlist wishlist = wishlistRepository.findById(id)
+                .filter(Wishlist::isShared)
+                .orElse(null);
+
+        if (wishlist == null) {
+            log.warn("Вишлист с таким id не найден");
+            throw new NotFoundException("Вишлист с таким id не найден");
+        }
+        return wishlistMapper.toDtoWithItems(wishlist);
+    }
+
+    @Transactional
+    public void setShared(UUID userId, UUID id) {
+        String username = securityUtil.getCurrentUsername();
+        Wishlist wishlist = wishlistRepository.findByIdAndUserId(id, userId)
+                .orElse(null);
+
+        if (wishlist == null) {
+            log.warn("Вишлист с id={} не найден у пользователя {}", id, username);
+            throw new NotFoundException("Вишлист с таким id не найден");
+        }
+
+        wishlist.setShared(true);
+        wishlistRepository.save(wishlist);
+    }
 }

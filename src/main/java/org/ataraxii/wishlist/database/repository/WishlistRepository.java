@@ -13,4 +13,6 @@ public interface WishlistRepository extends JpaRepository<Wishlist, UUID> {
     Optional<Wishlist> findByIdAndUserId(UUID id, UUID userId);
 
     List<Wishlist> findByUserId(UUID userId);
+
+    UUID id(UUID id);
 }

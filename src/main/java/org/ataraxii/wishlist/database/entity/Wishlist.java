@@ -26,6 +26,8 @@ public class Wishlist {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    private boolean shared;
+
     @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemWishlist> itemWishlist;
 }

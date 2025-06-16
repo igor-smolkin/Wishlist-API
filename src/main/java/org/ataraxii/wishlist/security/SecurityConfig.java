@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/shared/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -45,6 +45,7 @@ public class SecurityConfig {
         configuration.addAllowedMethod("POST");
         configuration.addAllowedMethod("PUT");
         configuration.addAllowedMethod("DELETE");
+        configuration.addAllowedMethod("PATCH");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
 

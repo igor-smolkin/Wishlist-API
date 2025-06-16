@@ -49,11 +49,4 @@ public class WishlistController {
         WishlistResponseDto response = wishlistService.updateWishlist(userId, id ,dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
-    @DeleteMapping("/wishlists/{id}")
-    public ResponseEntity<Void> deleteWishlist(@PathVariable UUID id) {
-        UUID userId = securityUtil.getCurrentUserId();
-        wishlistService.deleteWishlist(userId, id);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
 }

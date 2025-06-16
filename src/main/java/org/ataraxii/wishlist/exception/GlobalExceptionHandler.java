@@ -14,8 +14,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<Map<String, Object>> handleAlreadyExists(ConflictException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Conflict");
         body.put("message", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
@@ -24,8 +22,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(NotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", "Not found");
         body.put("message", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
@@ -34,8 +30,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpStatus.UNAUTHORIZED.value());
-        body.put("error", "Unauthorized");
         body.put("message", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
