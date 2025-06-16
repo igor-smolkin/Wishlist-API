@@ -46,7 +46,7 @@ jobs:
           port: ${{ secrets.PORT }}
           key: ${{ secrets.SERVER_PRIVATE_SSH_KEY }}
           script: |
-            cd /app/wish
+            cd /app/wish/Wishlist-API
             docker login -u ${{ secrets.REGISTRY_USER }} -p ${{ secrets.REGISTRY_PASS }} ${{ secrets.REGISTRY }}:5000
             docker compose pull
             docker compose up -d
