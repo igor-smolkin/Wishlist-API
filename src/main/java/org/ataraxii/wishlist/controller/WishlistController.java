@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/prod/")
+@RequestMapping("/app/")
 @RequiredArgsConstructor
 public class WishlistController {
 
@@ -35,18 +35,29 @@ public class WishlistController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/wishlists/{id}")
-    public ResponseEntity<WishlistItemsResponseDto> findWishlistById(@PathVariable UUID id) {
+    @GetMapping("/wishlists/{wishlistId}")
+    public ResponseEntity<WishlistItemsResponseDto> findWishlistById(@PathVariable UUID wishlistId) {
         UUID userId = securityUtil.getCurrentUserId();
-        WishlistItemsResponseDto response = wishlistService.findWishlistById(userId, id);
+        WishlistItemsResponseDto response = wishlistService.findWishlistById(userId, wishlistId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/wishlists/{id}")
-    public ResponseEntity<WishlistResponseDto> updateWishlist(@PathVariable UUID id,
-                                                              WishlistDto dto) {
+    // На переработке
+
+//    @PutMapping("/wishlists/{id}")
+//    public ResponseEntity<WishlistResponseDto> updateWishlist(@PathVariable UUID id,
+//                                                              @RequestBody WishlistDto dto) {
+//        UUID userId = securityUtil.getCurrentUserId();
+//        WishlistResponseDto response = wishlistService.updateWishlist(userId, id ,dto);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+
+    @PatchMapping("/wishlists/{wishlistId}")
+    public ResponseEntity<WishlistResponseDto> updateWishlist(
+            @PathVariable UUID wishlistId,
+            @RequestBody WishlistDto dto) {
         UUID userId = securityUtil.getCurrentUserId();
-        WishlistResponseDto response = wishlistService.updateWishlist(userId, id ,dto);
+        WishlistResponseDto response = wishlistService.updateWishlist(userId, wishlistId ,dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

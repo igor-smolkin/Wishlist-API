@@ -15,8 +15,15 @@ public class ItemDto {
     private String name;
 
     @Size(max = 255)
-    @NotBlank
     private String url;
+
+    private Integer price;
+
+    @Size(max = 255)
+    private String imageUrl;
+
+    @Size(max = 255)
+    private String comment;
 
     private UUID wishlistId;
 }

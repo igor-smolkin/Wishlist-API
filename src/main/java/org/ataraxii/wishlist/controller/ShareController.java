@@ -16,16 +16,16 @@ public class ShareController {
     private final WishlistService wishlistService;
     private final SecurityUtil securityUtil;
 
-    @GetMapping("/shared/{id}")
-    public ResponseEntity<WishlistItemsResponseDto> getSharedWishlist(@PathVariable UUID id) {
-        WishlistItemsResponseDto wishlist = wishlistService.checkShared(id);
+    @GetMapping("/shared/wishlists/{wishlistId}")
+    public ResponseEntity<WishlistItemsResponseDto> getSharedWishlist(@PathVariable UUID wishlistId) {
+        WishlistItemsResponseDto wishlist = wishlistService.checkShared(wishlistId);
         return ResponseEntity.ok(wishlist);
     }
 
-    @PatchMapping("/wishlists/share/{id}")
-    public ResponseEntity<Void> setShareWishlist(@PathVariable UUID id) {
+    @PatchMapping("/wishlists/share/{wishlistId}")
+    public ResponseEntity<Void> setShareWishlist(@PathVariable UUID wishlistId) {
         UUID userId = securityUtil.getCurrentUserId();
-        wishlistService.setShared(userId, id);
+        wishlistService.setShared(userId, wishlistId);
         return ResponseEntity.ok().build();
     }
 }

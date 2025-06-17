@@ -13,22 +13,15 @@ import java.util.UUID;
 @Builder
 public class ItemMapper {
 
-    public ItemResponseDto toDto(UUID userId, Item item) {
+    public ItemResponseDto toDto(Item item) {
         return ItemResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .url(item.getUrl())
-                .user(userId)
-                .build();
-    }
-
-    public ItemResponseDto toDto(UUID userId, Item item, UUID wishlistId) {
-        return ItemResponseDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .url(item.getUrl())
-                .user(userId)
-                .wishlistId(wishlistId)
+                .price(item.getPrice())
+                .imageUrl(item.getImageUrl())
+                .comment(item.getComment())
+                .user(item.getUserId())
                 .build();
     }
 }

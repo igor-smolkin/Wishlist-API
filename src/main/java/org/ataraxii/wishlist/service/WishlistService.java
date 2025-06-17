@@ -30,11 +30,16 @@ public class WishlistService {
     public WishlistResponseDto createWishlist(WishlistDto dto, UUID userId) {
         String username = securityUtil.getCurrentUsername();
         log.info("Создание вишлиста {} пользователем {}", dto.getName(), username);
-        Wishlist wishlist = org.ataraxii.wishlist.database.entity.Wishlist.builder()
+
+        Wishlist wishlist = Wishlist.builder()
                 .name(dto.getName())
+                .comment(dto.getComment())
+                .date(dto.getDate())
                 .userId(userId)
                 .build();
+
         wishlistRepository.save(wishlist);
+
         log.info("Вишлист {} успешно создан пользователем {}", dto.getName(), username);
         return wishlistMapper.toDto(wishlist);
     }
@@ -55,26 +60,47 @@ public class WishlistService {
 
         if (wishlist == null) {
             log.warn("Ошибка поиска вишлиста: вишлист с id={} не найден у пользователя {}", id, username);
-            throw new NotFoundException("Папка с таким id не найдена");
+            throw new NotFoundException("Вишлист с таким id не найдена");
         }
         log.info("Вишлист {} найден у пользователя {}", wishlist.getName(), username);
         return wishlistMapper.toDtoWithItems(wishlist);
     }
 
-    public WishlistResponseDto updateWishlist(UUID userId, UUID itemId, WishlistDto dto) {
+    // На переработке
+
+//    public WishlistResponseDto updateWishlist(UUID userId, UUID itemId, WishlistDto dto) {
+//        String username = securityUtil.getCurrentUsername();
+//        Wishlist wishlist = wishlistRepository.findByIdAndUserId(itemId, userId)
+//                .orElse(null);
+//
+//        if (wishlist == null) {
+//            log.warn("Ошибка обновления вишлиста: вишлист с id={} не найден у пользователя {}", itemId, username);
+//            throw new NotFoundException("Вишлист с таким id не найден");
+//        }
+//        log.info("Обновление вишлиста {} пользователем {}", wishlist.getName(), username);
+//
+//        String oldName = wishlist.getName();
+//        wishlist.setName(dto.getName());
+//        log.info("Имя вишлиста успешно изменено: {} -> {}", oldName, wishlist.getName());
+//
+//        wishlistRepository.save(wishlist);
+//        return wishlistMapper.toDto(wishlist);
+//    }
+
+        public WishlistResponseDto updateWishlist(UUID userId, UUID wishlistId, WishlistDto dto) {
         String username = securityUtil.getCurrentUsername();
-        Wishlist wishlist = wishlistRepository.findByIdAndUserId(itemId, userId)
-                .orElse(null);
 
-        if (wishlist == null) {
-            log.warn("Ошибка обновления вишлиста: вишлист с id={} не найден у пользователя {}", itemId, username);
-            throw new NotFoundException("Вишлист с таким id не найден");
-        }
-        log.info("Обновление вишлиста {} пользователем {}", wishlist.getName(), username);
+        Wishlist wishlist = wishlistRepository.findByIdAndUserId(wishlistId, userId)
+                .orElseThrow(() -> {
+                    log.warn("Ошибка обновления вишлиста: вишлист с id='{}' не найден у пользователя '{}'", wishlistId, username);
+                    return new NotFoundException("Вишлист с таким id не найден");
+                });
 
-        String oldName = wishlist.getName();
-        wishlist.setName(dto.getName());
-        log.info("Имя вишлиста успешно изменено: {} -> {}", oldName, wishlist.getName());
+        log.info("Обновление вишлиста '{}' пользователем '{}'", wishlist.getName(), username);
+
+        if (dto.getName() != null) wishlist.setName(dto.getName());
+        if (dto.getComment() != null) wishlist.setComment(dto.getComment());
+        if (dto.getDate() != null) wishlist.setDate(dto.getDate());
 
         wishlistRepository.save(wishlist);
         return wishlistMapper.toDto(wishlist);

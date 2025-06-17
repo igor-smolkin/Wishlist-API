@@ -35,93 +35,125 @@ public class ItemService {
     public ItemResponseDto createItem(ItemDto dto, UUID userId) {
         String username = securityUtil.getCurrentUsername();
         log.info("Создание предмета '{}' пользователем '{}'", dto.getName(), username);
+
+        Wishlist wishlist = wishlistRepository.findByIdAndUserId(dto.getWishlistId(), userId)
+                .orElse(null);
+
+        if (wishlist == null) {
+            log.warn("Ошибка создания предмета: вишлист с id='{}' не найден у пользователя '{}'", dto.getWishlistId(), username);
+            throw new NotFoundException("Вишлист не найден");
+        }
+
         Item item = Item.builder()
                 .name(dto.getName())
                 .url(dto.getUrl())
+                .price(dto.getPrice())
+                .imageUrl(dto.getImageUrl())
+                .comment(dto.getComment())
                 .userId(userId)
                 .build();
 
-        UUID wishlistId = null;
+        itemRepository.save(item);
+        log.info("Предмет '{}' успешно создан в вишлисте '{}' пользователем '{}'", item.getName(), wishlist.getName(), username);
 
-        if (dto.getWishlistId() != null) {
-            Wishlist wishlist = wishlistRepository.findByIdAndUserId(dto.getWishlistId(), userId)
-                    .orElse(null);
+        ItemWishlist itemWishlist = ItemWishlist.builder()
+                .item(item)
+                .wishlist(wishlist)
+                .build();
 
-            if (wishlist == null) {
-                log.warn("Ошибка создания предмета: вишлист с id={} не найден у пользователя '{}'", dto.getWishlistId(), username);
-                throw new NotFoundException("Вишлист не найден");
-            }
-            itemRepository.save(item);
-            log.info("Предмет '{}' успешно создан в вишлисте '{}' пользователем '{}'", item.getName(), wishlist.getName(), username);
+        itemWishlistRepository.save(itemWishlist);
 
-            ItemWishlist itemWishlist = ItemWishlist.builder()
-                    .item(item)
-                    .wishlist(wishlist)
-                    .build();
-            itemWishlistRepository.save(itemWishlist);
-            wishlistId = wishlist.getId();
-        } else {
-            itemRepository.save(item);
-            log.info("Предмет '{}' успешно создан пользователем '{}'", item.getName(), username);
-        }
-        return itemMapper.toDto(userId, item, wishlistId);
+        return itemMapper.toDto(item);
     }
 
-    public List<ItemResponseDto> findAllItems(UUID userId) {
-        String username = securityUtil.getCurrentUsername();
-        List<Item> items = itemRepository.findAllByUserId(userId);
-        log.info("Найдено '{}' предметов у пользователя '{}'", items.size(), username);
-        return items.stream()
-                .map(item -> {
-                    UUID wishlistId = null;
-                    List<ItemWishlist> wishlists = item.getItemWishlist();
-                    if (wishlists != null && !wishlists.isEmpty()) {
-                        wishlistId = wishlists.get(0).getWishlist().getId();
-                    }
-                    return itemMapper.toDto(userId, item, wishlistId);
-                })
-                .collect(Collectors.toList());
-    }
+    // На переработке
 
-    public ItemResponseDto findItemById(UUID userId, UUID itemId) {
-        String username = securityUtil.getCurrentUsername();
-        Item item = itemRepository.findItemByIdAndUserId(itemId, userId)
-                .orElseThrow(() -> new NotFoundException("Предмет с таким id не найден"));
-        log.info("Предмет '{}' найден у пользователя '{}'", item.getName(), username);
-        return itemMapper.toDto(userId, item);
-    }
+//    public List<ItemResponseDto> findAllItems(UUID userId) {
+//        String username = securityUtil.getCurrentUsername();
+//        List<Item> items = itemRepository.findAllByUserId(userId);
+//        log.info("Найдено '{}' предметов у пользователя '{}'", items.size(), username);
+//        return items.stream()
+//                .map(item -> {
+//                    List<ItemWishlist> wishlists = item.getItemWishlist();
+//                    UUID wishlistId = wishlists.get(0).getWishlist().getId();
+//
+//                    return itemMapper.toDto(item, wishlistId);
+//
+//                })
+//                .collect(Collectors.toList());
+//    }
+
+    // На переработке
+
+//    public ItemResponseDto findItemById(UUID userId, UUID itemId) {
+//        String username = securityUtil.getCurrentUsername();
+//        Item item = itemRepository.findItemByIdAndUserId(itemId, userId)
+//                .orElseThrow(() -> new NotFoundException("Предмет с таким id не найден"));
+//        log.info("Предмет '{}' найден у пользователя '{}'", item.getName(), username);
+//        return itemMapper.toDto(userId, item);
+//    }
+
+    // На переработке
 
     @Transactional
-    public ItemResponseDto updateItem(UUID userId, UUID itemId, ItemDto updatedItem) {
+    public ItemResponseDto updateItem(UUID userId, UUID wishlistId, UUID itemId, ItemDto dto) {
         String username = securityUtil.getCurrentUsername();
+
+        Wishlist wishlist = wishlistRepository.findByIdAndUserId(wishlistId, userId)
+                .orElseThrow(() -> {
+                    log.warn("Ошибка при изменении предмета: Вишлист с id='{}' не найден у пользователя '{}'", wishlistId, username);
+                    return new NotFoundException("Вишлист не найден");
+                });
+
         Item item = itemRepository.findByIdAndUserId(itemId, userId)
-                .orElse(null);
+                .orElseThrow(() -> {
+                    log.warn("Ошибка при изменении предмета: предмет с id='{}' не найден у пользователя '{}'", itemId, username);
+                    return new NotFoundException("Предмет с таким id не найден");
+                });
 
-        if (item == null) {
-            log.warn("Ошибка обновления предмета: предмет с id={} не найден у пользователя '{}'", itemId, username);
-            throw new NotFoundException("Предмет с таким id не найден");
-        }
-        log.info("Обновление вишлиста '{}' пользователем '{}'", item.getName(), username);
+        ItemWishlist itemWishlist = itemWishlistRepository.findByItemIdAndWishlistId(itemId, wishlistId)
+                .orElseThrow(() -> {
+                    log.warn("Ошибка при изменении предмета: Предмет с id='{}' не принадлежит вишлисту с id='{}'", itemId, wishlistId);
+                    return new NotFoundException("Предмет не принадлежит этому вишлисту");
+                });
 
-        item.setName(updatedItem.getName());
-        item.setUrl(updatedItem.getUrl());
+        if (dto.getName() != null) item.setName(dto.getName());
+        if (dto.getUrl() != null) item.setUrl(dto.getUrl());
+        if (dto.getPrice() != null) item.setPrice(dto.getPrice());
+        if (dto.getImageUrl() != null) item.setComment(dto.getComment());
+
+        itemRepository.save(item);
+
         log.info("Предмет '{}' успешно изменен пользователем '{}'", item.getName(), username);
 
         itemRepository.save(item);
-        return itemMapper.toDto(userId, item);
+        return itemMapper.toDto(item);
     }
 
     @Transactional
-    public void deleteItem(UUID userId, UUID itemId) {
-        String username = securityUtil.getCurrentUsername();
-        Item item = itemRepository.findByIdAndUserId(itemId, userId)
-                .orElse(null);
+    public void deleteItem(UUID userId, UUID wishlistId, UUID itemId) {
 
-        if (item == null) {
-            log.warn("Ошибка удаления предмета: предмет с id={} не найден у пользователя '{}'", itemId, username);
-            throw new NotFoundException("Предмет с таким id не найден");
-        }
+        String username = securityUtil.getCurrentUsername();
+
+        Wishlist wishlist = wishlistRepository.findByIdAndUserId(wishlistId, userId)
+                .orElseThrow(() -> {
+                    log.warn("Ошибка при удалении предмета: Вишлист с id='{}' не найден у пользователя '{}'", wishlistId, username);
+                    return new NotFoundException("Вишлист не найден");
+                });
+
+        Item item = itemRepository.findByIdAndUserId(itemId, userId)
+                .orElseThrow(() -> {
+                    log.warn("Ошибка при удалении предмета: Предмет с id='{}' не найден у пользователя '{}'", itemId, username);
+                    return new NotFoundException("Предмет не найден");
+                });
+
+        ItemWishlist itemWishlist = itemWishlistRepository.findByItemIdAndWishlistId(itemId, wishlistId)
+                .orElseThrow(() -> {
+                    log.warn("Ошибка при удалении предмета: Предмет с id='{}' не принадлежит вишлисту с id='{}'", itemId, wishlistId);
+                    return new NotFoundException("Предмет не принадлежит этому вишлисту");
+                });
+
         itemRepository.delete(item);
-        log.info("Предмет {} удален пользователем {}", item.getName(), username);
+        log.info("Предмет '{}' удален пользователем '{}'", item.getName(), username);
     }
 }

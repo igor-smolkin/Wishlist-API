@@ -26,6 +26,13 @@ public class Item {
     @Column(nullable = false)
     private String url;
 
+    private Integer price;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    private String comment;
+
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
