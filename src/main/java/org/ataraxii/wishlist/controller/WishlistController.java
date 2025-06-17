@@ -42,7 +42,7 @@ public class WishlistController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // На переработке
+    // На переработке //
 
 //    @PutMapping("/wishlists/{id}")
 //    public ResponseEntity<WishlistResponseDto> updateWishlist(@PathVariable UUID id,
